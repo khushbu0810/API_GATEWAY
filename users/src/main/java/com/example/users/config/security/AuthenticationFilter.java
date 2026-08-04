@@ -1,13 +1,17 @@
 package com.example.users.config.security;
 
 import com.example.users.dto.LoginDTO;
+import com.example.users.dto.UserDTO;
 import com.example.users.service.UserService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +20,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tools.jackson.databind.ObjectMapper;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.Instant;
+import java.util.*;
 
 /*
  * This filter is triggered when a user attempts to log in.
@@ -77,5 +83,30 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain, Authentication authentication) throws IOException, ServletException {
 
+        //take authenticated user details and generate jwt token
+        String username = ((User) Objects.requireNonNull(authentication.getPrincipal())).getUsername();
+
+        UserDTO userDTO = userService.getUserByEmail(username);
+
+        String tokenSecret = environment.getProperty("token.secret");
+
+        assert tokenSecret != null;
+        byte[] secretKeyBytes = Base64.getEncoder().encode(tokenSecret.getBytes());
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(secretKeyBytes);
+
+        // Generate JWT token
+        String token = Jwts.builder()
+                .setSubject(userDTO.getUserId())
+                .setExpiration(new Date(
+                        System.currentTimeMillis()
+                                + Long.parseLong(Objects.requireNonNull(environment.getProperty("token.expiration_time")))))
+                .setIssuedAt(Date.from(Instant.now()))
+                .signWith(secretKey)
+                .compact();
+
+        // Add JWT token to response header
+        response.addHeader("token", token);
+        response.addHeader("userId", userDTO.getUserId());
     }
 }
