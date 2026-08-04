@@ -1,10 +1,14 @@
 package com.example.users.config;
 
+import com.example.users.config.security.AuthenticationFilter;
+import com.example.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,8 +25,19 @@ public class WebSecurity {
     @Autowired
     private Environment environment;
 
+    private final UserService userService;
+    private final AuthenticationConfiguration authenticationConfiguration;
+
     @Bean
-    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        AuthenticationFilter authenticationFilter =
+                new AuthenticationFilter(authenticationManager(), userService, environment);
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
@@ -35,7 +50,9 @@ public class WebSecurity {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/users/ip").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .addFilter(authenticationFilter);
+
         http
                 .headers((headers) ->
                         headers
