@@ -67,7 +67,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                             loginCred.getPassword(),
                             new ArrayList<>()
                     );
-            return authenticationManager.authenticate(authenticationToken);
+            return getAuthenticationManager().authenticate(authenticationToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
