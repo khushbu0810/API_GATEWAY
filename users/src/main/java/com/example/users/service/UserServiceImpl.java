@@ -1,13 +1,12 @@
 package com.example.users.service;
 
-import com.example.users.entity.UserDTO;
+import com.example.users.dto.UserDTO;
 import com.example.users.entity.UserEntity;
 import com.example.users.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
 
 import java.util.UUID;
 

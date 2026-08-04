@@ -1,9 +1,10 @@
 package com.example.users.controller;
 
-import com.example.users.entity.UserDTO;
-import com.example.users.entity.UserRequest;
-import com.example.users.entity.UserResponse;
+import com.example.users.dto.UserDTO;
+import com.example.users.dto.UserRequest;
+import com.example.users.dto.UserResponse;
 import com.example.users.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,10 @@ public class UserController {
         BeanUtils.copyProperties(createdUser, response);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/ip")
+    public String ip(HttpServletRequest request) {
+        return request.getRemoteAddr();
     }
 }
