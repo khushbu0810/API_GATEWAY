@@ -29,14 +29,12 @@ public class WebSecurity {
 
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    AuthenticationManagerBuilder authenticationManagerBuilder=http.getSharedObject(AuthenticationManagerBuilder.class);
-    authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
-
-    AuthenticationManager authenticationManager=authenticationManagerBuilder.build();
+        AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
 
     AuthenticationFilter authenticationFilter=new AuthenticationFilter(authenticationManager,userService,environment);
 
@@ -49,6 +47,7 @@ public class WebSecurity {
                         //allowing request from api gateway only
                         .access(new WebExpressionAuthorizationManager(
                                 "hasIpAddress('" + environment.getProperty("gateway.ip") + "')"))
+//                                .requestMatchers("/users").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/users/ip").permitAll()
                         .anyRequest().authenticated()

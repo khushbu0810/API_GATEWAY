@@ -3,22 +3,21 @@ package com.example.users.config.security;
 import com.example.users.dto.LoginDTO;
 import com.example.users.dto.UserDTO;
 import com.example.users.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -55,13 +54,22 @@ at end RETURN -> Send username and password to Spring Security.
  */
 
 
-@RequiredArgsConstructor
-@AllArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final Environment environment;
+
+    public AuthenticationFilter(AuthenticationManager authenticationManager,
+                                UserService userService,
+                                Environment environment) {
+
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+        this.environment = environment;
+
+        super.setAuthenticationManager(authenticationManager);
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -73,7 +81,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                             loginCred.getPassword(),
                             new ArrayList<>()
                     );
-            return getAuthenticationManager().authenticate(authenticationToken);
+            return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
