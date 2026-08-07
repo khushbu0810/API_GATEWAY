@@ -19,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 
+import java.util.Objects;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -36,7 +38,10 @@ public class WebSecurity {
 
         AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
 
-    AuthenticationFilter authenticationFilter=new AuthenticationFilter(authenticationManager,userService,environment);
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, userService, environment);
+
+        //adding custom url for login
+        authenticationFilter.setFilterProcessesUrl(Objects.requireNonNull(environment.getProperty("login.url.path")));
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -47,7 +52,6 @@ public class WebSecurity {
                         //allowing request from api gateway only
                         .access(new WebExpressionAuthorizationManager(
                                 "hasIpAddress('" + environment.getProperty("gateway.ip") + "')"))
-//                                .requestMatchers("/users").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/users/ip").permitAll()
                         .anyRequest().authenticated()
