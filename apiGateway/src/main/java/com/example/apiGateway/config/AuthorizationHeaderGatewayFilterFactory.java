@@ -17,7 +17,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
-import javax.security.auth.Subject;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -25,12 +24,12 @@ import java.util.Objects;
  * this filter will be triggered before any route execution --> assign this to gateway route
  */
 @Component
-public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
+public class AuthorizationHeaderGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthorizationHeaderGatewayFilterFactory.Config> {
 
     @Autowired
     Environment environment;
 
-    public AuthorizationHeaderFilter(){
+    public AuthorizationHeaderGatewayFilterFactory(){
         super(Config.class);
     }
 
