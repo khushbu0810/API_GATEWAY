@@ -48,8 +48,8 @@ public class WebSecurity {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users")
-                        //allowing request from api gateway only
+                        // Requests coming from API Gateway
+                        .requestMatchers("/users/**")
                         .access(new WebExpressionAuthorizationManager(
                                 "hasIpAddress('" + environment.getProperty("gateway.ip") + "')"))
                         .requestMatchers("/h2-console/**").permitAll()
