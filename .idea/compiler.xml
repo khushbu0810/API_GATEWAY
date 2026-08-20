@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="apiGateway" />
         <module name="account-mgmt" />
+        <module name="ConfigServer" />
         <module name="Eureka" />
         <module name="users" />
       </profile>
@@ -16,6 +17,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ConfigServer" options="-parameters" />
       <module name="Eureka" options="-parameters" />
       <module name="account-mgmt" options="-parameters" />
       <module name="apiGateway" options="-parameters" />
