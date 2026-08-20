@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Mono;
 
 @Configuration
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 public class GlobalFiltersConfigurations {
 
     //instead of passing as arguments, we pass as lambda expressions here .... and pre and post are working in same function...
+    @Order(1)
     @Bean
     public GlobalFilter secondPreFilter() {
         return (exchange, chain) -> {
@@ -21,6 +23,7 @@ public class GlobalFiltersConfigurations {
         };
     }
 
+    @Order(2)
     @Bean
     public GlobalFilter thirdPreFilter() {
         return (exchange, chain) -> {

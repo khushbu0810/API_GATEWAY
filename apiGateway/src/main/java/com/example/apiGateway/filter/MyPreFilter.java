@@ -3,6 +3,7 @@ package com.example.apiGateway.filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 @Component
 @Slf4j
-public class MyPreFilter implements GlobalFilter {
+public class MyPreFilter implements GlobalFilter, Ordered {
 
     // global filter access details of each http request and
     // log the request path as well as name, value of each http request header.
@@ -34,5 +35,10 @@ public class MyPreFilter implements GlobalFilter {
         });
 
         return chain.filter(exchange);
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
     }
 }
