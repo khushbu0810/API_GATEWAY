@@ -2,6 +2,7 @@ package com.example.ConfigServer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -12,7 +13,9 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //authentication for each user endpoints - Basic authentication
         http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/actuator/busrefresh").hasRole("ADMIN")
+                        .anyRequest().authenticated())
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/actuator/busrefresh"))
                 .httpBasic(Customizer.withDefaults());
         return http.build();
