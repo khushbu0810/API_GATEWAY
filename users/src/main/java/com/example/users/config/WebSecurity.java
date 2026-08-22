@@ -53,6 +53,7 @@ public class WebSecurity {
                         .access(new WebExpressionAuthorizationManager(
                                 "hasIpAddress('" + environment.getProperty("gateway.ip") + "')"))
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/users/ip").permitAll()
                         .anyRequest().authenticated()
                 )
