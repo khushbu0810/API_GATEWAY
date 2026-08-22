@@ -27,9 +27,12 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //authentication for each user endpoints - Basic authentication
+        //restricting actuator endpoint to ADMIN role
+        //get role allowed for CLIENT role
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/actuator/busrefresh").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/**").hasRole("CLIENT")
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/actuator/busrefresh"))
                 .httpBasic(Customizer.withDefaults());
@@ -45,7 +48,13 @@ public class SecurityConfig {
                 .roles(Objects.requireNonNull(environment.getProperty("spring.security.user.roles")))
                 .build();
 
-        return new InMemoryUserDetailsManager(admin);
+        UserDetails client = User
+                .withUsername(Objects.requireNonNull(environment.getProperty("my-spring.security.user.name")))
+                .password(passwordEncoder.encode(environment.getProperty("my-spring.security.user.password")))
+                .roles(Objects.requireNonNull(environment.getProperty("my-spring.security.user.roles")))
+                .build();
+
+        return new InMemoryUserDetailsManager(admin,client);
     }
 
     @Bean
